@@ -4,16 +4,17 @@ import {cursor} from "@airtable/blocks";
 import {useSettings} from './settings/settings';
 import SettingsForm from './settings/SettingsForm';
 import { viewport } from "@airtable/blocks";
-import {TextButton} from "@airtable/blocks/ui";
+import {TextButton, Text} from "@airtable/blocks/ui";
+import PagePreview from './PagePreview';
 
 
-function PagePreviewer() {
-     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+function PagePreviewBlock() {
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     useSettingsButton(() => setIsSettingsOpen(!isSettingsOpen));
-
     const [selectedRecordId, setSelectedRecordId] = useState('');
     const [selectedFieldId, setSelectedFieldId] = useState('');
     useLoadable(cursor);
+    useWatchable(cursor, ['selectedRecordIds', 'selectedFieldIds']);
     const base = useBase();
     const activeTable = base.getTableByIdIfExists(cursor.activeTableId);
     const {isValid} = useSettings();
@@ -56,10 +57,15 @@ function PagePreviewer() {
                         variant="light"
                     />
                 </Box>
-                
             </Box>
-            <Box paddingX={4} paddingY={3}>
-                <Heading>Untitled</Heading>
+            <Box paddingX={4} paddingY={3} display="flex" flexDirection="column">
+                {isValid? <PagePreview/>
+                : 
+                <div>
+                    <Heading marginBottom={1}>Untitled</Heading>
+                    <Text></Text>
+
+                </div>}
             </Box>
             {isSettingsOpen ? (
                 <SettingsForm setIsSettingsOpen={setIsSettingsOpen}/>
@@ -69,4 +75,4 @@ function PagePreviewer() {
     )
 }
 
-initializeBlock(() => <PagePreviewer />);
+initializeBlock(() => <PagePreviewBlock />);
