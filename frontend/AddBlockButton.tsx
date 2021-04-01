@@ -15,12 +15,14 @@ interface IProps {
   selectedBlocks: BlockInterface[];
   addBlocks: Function;
   isStaticButton: boolean;
+  insertIndex: number;
 }
 
 export default function AddBlockButton({
   selectedBlocks,
   addBlocks,
   isStaticButton,
+  insertIndex,
 }: IProps) {
   const [isShowAddButton, setShowAddButton] = useState(false);
   const handleShowAddButton = () => {
@@ -31,9 +33,17 @@ export default function AddBlockButton({
   };
   let message = "Add block";
   if (selectedBlocks.length > 1) {
-    message = `insert ${selectedBlocks.length} blocks`;
+    if (isStaticButton) {
+      message = `Add ${selectedBlocks.length} blocks`;
+    } else {
+      message = `insert ${selectedBlocks.length} blocks`;
+    }
   } else if (selectedBlocks.length === 1) {
-    message = "insert 1 block";
+    if (isStaticButton) {
+      message = `Add 1 block`;
+    } else {
+      message = "insert 1 block";
+    }
   }
   if (isStaticButton) {
     return (
@@ -52,7 +62,7 @@ export default function AddBlockButton({
           alignItems="center"
           justifyContent="center"
           onClick={() => {
-            addBlocks(selectedBlocks);
+            addBlocks(selectedBlocks, insertIndex);
           }}
         >
           <TextButton
@@ -75,6 +85,9 @@ export default function AddBlockButton({
       paddingX="20px"
       height="18px"
       backgroundColor={isShowAddButton ? "lightGray1" : "white"}
+      onClick={() => {
+        addBlocks(selectedBlocks, insertIndex);
+      }}
     >
       {isShowAddButton ? (
         <Box
@@ -84,9 +97,6 @@ export default function AddBlockButton({
           flexDirection="row"
           alignItems="center"
           justifyContent="center"
-          onClick={() => {
-            addBlocks(selectedBlocks);
-          }}
         >
           <TextButton
             onClick={() => console.log("Button clicked")}

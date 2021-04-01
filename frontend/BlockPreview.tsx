@@ -65,9 +65,12 @@ export default function BlockPreview(props: {
       display="flex"
       flexDirection="row"
       width="100%"
+      paddingX="1px"
+      paddingY="1px"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       backgroundColor={isHover ? "#E3ECFD" : "white"}
+      minHeight="16px"
     >
       {isHover ? (
         <Box display="flex" flexDirection="row" width="16px" height="auto">
@@ -82,15 +85,23 @@ export default function BlockPreview(props: {
       ) : (
         <Box width="16px" height="auto"></Box>
       )}
-      <Box width="100%" paddingX="2px">
-        <Box
-          width="100%"
-          height="12px"
-          display="flex"
-          flexDirection="row-reverse"
-          marginBottom="-12px"
-        >
-          {isHover ? (
+      <Box width="100%">
+        {isHover ? (
+          <Box
+            width="100%"
+            height="20px"
+            display="flex"
+            flexDirection="row-reverse"
+            marginBottom="-20px"
+          >
+            <TextButton
+              onClick={() => console.log("Button clicked")}
+              variant="light"
+              icon="x"
+              size="small"
+              aria-label="delete"
+              marginRight="3px"
+            />
             <TextButton
               onClick={() => expandRecord(record)}
               icon="overflow"
@@ -99,10 +110,11 @@ export default function BlockPreview(props: {
               aria-label="expand"
               marginRight="3px"
             />
-          ) : (
-            ""
-          )}
-        </Box>
+          </Box>
+        ) : (
+          ""
+        )}
+
         <ShowHTML html={html} />
       </Box>
     </Box>

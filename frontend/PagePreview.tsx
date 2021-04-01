@@ -44,14 +44,23 @@ export default function PagePreview({ isValid }: IProps) {
     }
     return selectedBlocks;
   };
-  const addBlocks = (selectedBlocks: BlockInterface[]) => {
+  const addBlocks = (selectedBlocks: BlockInterface[], index: number) => {
     if (selectedBlocks.length) {
-      const newBlockArrays = blockArrays.concat(selectedBlocks);
+      let newBlockArrays = blockArrays;
+      if (blockArrays.length === index) {
+        newBlockArrays = blockArrays.concat(selectedBlocks);
+      } else if (index === 0) {
+        newBlockArrays = selectedBlocks.concat(blockArrays);
+      } else {
+        newBlockArrays.splice(index, 0, ...selectedBlocks);
+        newBlockArrays = [...newBlockArrays];
+      }
       setBlockArrays(newBlockArrays);
     } else {
       console.log("you have not selected anything!");
     }
   };
+
   useEffect(() => {
     console.log("blockArrays", blockArrays);
   }, [blockArrays]);
@@ -68,7 +77,7 @@ export default function PagePreview({ isValid }: IProps) {
         width="100%"
       >
         <TextButton
-          onClick={() => addBlocks(getSelectedBlocks())}
+          onClick={() => addBlocks(getSelectedBlocks(), 1)}
           icon="plus"
           variant="light"
         >
@@ -120,12 +129,14 @@ export default function PagePreview({ isValid }: IProps) {
             selectedBlocks={getSelectedBlocks()}
             addBlocks={addBlocks}
             isStaticButton={true}
+            insertIndex={0}
           />
         ) : (
           <AddBlockButton
             selectedBlocks={getSelectedBlocks()}
             addBlocks={addBlocks}
             isStaticButton={false}
+            insertIndex={0}
           />
         )}
         <div>
@@ -142,6 +153,7 @@ export default function PagePreview({ isValid }: IProps) {
                 selectedBlocks={getSelectedBlocks()}
                 addBlocks={addBlocks}
                 isStaticButton={blockArrays.length === index + 1 ? true : false}
+                insertIndex={index + 1}
               />
             </Box>
           ))}
