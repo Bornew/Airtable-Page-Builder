@@ -42,8 +42,10 @@ export default function BlockPreview(props: {
   table: Table;
   recordId: string;
   field: Field;
+  deleteBlock: Function;
+  deleteIndex: number;
 }) {
-  const { table, recordId, field } = props;
+  const { table, recordId, field, deleteBlock, deleteIndex } = props;
   const [isHover, setHover] = useState(false);
 
   const record = useRecordById(table, recordId, { fields: [field] });
@@ -95,7 +97,9 @@ export default function BlockPreview(props: {
             marginBottom="-20px"
           >
             <TextButton
-              onClick={() => console.log("Button clicked")}
+              onClick={() => {
+                deleteBlock(deleteIndex);
+              }}
               variant="light"
               icon="x"
               size="small"

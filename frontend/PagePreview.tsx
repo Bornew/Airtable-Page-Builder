@@ -61,6 +61,13 @@ export default function PagePreview({ isValid }: IProps) {
     }
   };
 
+  const deleteBlock = (index: number) => {
+    let newBlockArrays = blockArrays;
+    newBlockArrays.splice(index, 1);
+    newBlockArrays = [...newBlockArrays];
+    setBlockArrays(newBlockArrays);
+  };
+
   useEffect(() => {
     console.log("blockArrays", blockArrays);
   }, [blockArrays]);
@@ -68,13 +75,15 @@ export default function PagePreview({ isValid }: IProps) {
   const Toolbar = () => {
     return (
       <Box
+        position="sticky"
         display="flex"
         flexDirection="row"
         justifyContent="space-between"
-        alignContent="center"
+        alignItems="center"
         paddingX="2vw"
         paddingY={3}
         width="100%"
+        height="20px"
       >
         <TextButton
           onClick={() => addBlocks(getSelectedBlocks(), 1)}
@@ -103,11 +112,7 @@ export default function PagePreview({ isValid }: IProps) {
     );
   };
   if (!isValid) {
-    return (
-      <div>
-        <Toolbar />
-      </div>
-    );
+    return <Toolbar />;
   }
   return (
     <Box
@@ -148,6 +153,8 @@ export default function PagePreview({ isValid }: IProps) {
                 table={block.table}
                 recordId={block.recordId}
                 field={block.field}
+                deleteBlock={deleteBlock}
+                deleteIndex={index}
               />
               <AddBlockButton
                 selectedBlocks={getSelectedBlocks()}
