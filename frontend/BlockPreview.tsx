@@ -1,6 +1,14 @@
 import { Field, Table } from "@airtable/blocks/models";
-import { useRecordById, Text, Box, Button, Icon } from "@airtable/blocks/ui";
-import React from "react";
+import {
+  useRecordById,
+  Text,
+  Box,
+  Button,
+  Icon,
+  TextButton,
+  expandRecord,
+} from "@airtable/blocks/ui";
+import React, { useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
 // import sanitizeHtml from "sanitize-html";
 import MarkdownIt from "markdown-it";
@@ -36,34 +44,66 @@ export default function BlockPreview(props: {
   field: Field;
 }) {
   const { table, recordId, field } = props;
-  console.log("blockPreview");
+  const [isHover, setHover] = useState(false);
+
   const record = useRecordById(table, recordId, { fields: [field] });
   if (!record) {
     console.log("no Record");
     return <p>"Error: Record not found."</p>;
   }
-
   const html = (record.getCellValue(field) || "").toString();
   console.log(html);
+  const handleMouseEnter = () => {
+    setHover(true);
+  };
+  const handleMouseLeave = () => {
+    setHover(false);
+  };
+
   return (
-    <Box>
-      <ShowHTML html={html} />
-      <Box
-        width="100%"
-        height="28px"
-        backgroundColor="lightGray1"
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Icon
-          name="plus"
-          size={16}
-          fillColor="hsl(0,0%,46%)"
-          marginRight="4px"
-        />
-        <Text textColor="light">Add</Text>
+    <Box
+      display="flex"
+      flexDirection="row"
+      width="100%"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      backgroundColor={isHover ? "#E3ECFD" : "white"}
+    >
+      {isHover ? (
+        <Box display="flex" flexDirection="row" width="16px" height="auto">
+          <TextButton
+            onClick={() => console.log("Button clicked")}
+            variant="light"
+            icon="dragHandle"
+            size="large"
+            aria-label="dragHandle"
+          />
+        </Box>
+      ) : (
+        <Box width="16px" height="auto"></Box>
+      )}
+      <Box width="100%" paddingX="2px">
+        <Box
+          width="100%"
+          height="12px"
+          display="flex"
+          flexDirection="row-reverse"
+          marginBottom="-12px"
+        >
+          {isHover ? (
+            <TextButton
+              onClick={() => expandRecord(record)}
+              icon="overflow"
+              variant="light"
+              size="small"
+              aria-label="expand"
+              marginRight="3px"
+            />
+          ) : (
+            ""
+          )}
+        </Box>
+        <ShowHTML html={html} />
       </Box>
     </Box>
   );

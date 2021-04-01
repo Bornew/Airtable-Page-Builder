@@ -8,6 +8,7 @@ import {
   Box,
   Text,
   Heading,
+  TextButton,
   Icon,
   Button,
 } from "@airtable/blocks/ui";
@@ -15,11 +16,13 @@ import React, { useEffect, useState } from "react";
 import { cursor } from "@airtable/blocks";
 import { allowedUrlFieldTypes, useSettings } from "./settings/settings";
 import BlockPreview from "./BlockPreview";
+import AddBlockButton from "./AddBlockButton";
 
-export default function PagePreview() {
-  // const {
-  //     settings: {table},
-  // } = useSettings();
+interface IProps {
+  isValid: Boolean;
+}
+
+export default function PagePreview({ isValid }: IProps) {
   let errorMessage = null;
   const base = useBase();
   useWatchable(cursor, ["selectedRecordIds", "selectedFieldIds"]);
@@ -28,57 +31,121 @@ export default function PagePreview() {
   const selectedFieldIds = cursor.selectedFieldIds;
   const selectedRecordIds = cursor.selectedRecordIds;
 
-  const addBlocks = (selectedBlocks: BlockInterface[]) => {
-    const newBlockArrays = blockArrays.concat(selectedBlocks);
-    setBlockArrays(newBlockArrays);
+  const getSelectedBlocks = () => {
+    let selectedBlocks: BlockInterface[] = [];
+    if (selectedRecordIds && selectedFieldIds) {
+      selectedBlocks = selectedRecordIds
+        .map((selectedRecordId) => ({
+          table: activeTable,
+          recordId: selectedRecordId,
+          field: activeTable.getField(selectedFieldIds[0]),
+        }))
+        .concat();
+    }
+    return selectedBlocks;
   };
-
+  const addBlocks = (selectedBlocks: BlockInterface[]) => {
+    if (selectedBlocks.length) {
+      const newBlockArrays = blockArrays.concat(selectedBlocks);
+      setBlockArrays(newBlockArrays);
+    } else {
+      console.log("you have not selected anything!");
+    }
+  };
   useEffect(() => {
     console.log("blockArrays", blockArrays);
   }, [blockArrays]);
-  return (
-    <Box paddingX={4} paddingY={3} display="flex" flexDirection="column">
-      <div>
-        <Heading marginBottom={4}>{activeTable.name}</Heading>
-        {blockArrays.map((block) => (
-          <BlockPreview
-            table={block.table}
-            recordId={block.recordId}
-            field={block.field}
-          />
-        ))}
-      </div>
+
+  const Toolbar = () => {
+    return (
       <Box
-        onClick={() => {
-          if (selectedRecordIds && selectedFieldIds) {
-            const selectedBlocks: BlockInterface[] = selectedRecordIds
-              .map((selectedRecordId) => ({
-                table: activeTable,
-                recordId: selectedRecordId,
-                field: activeTable.getField(selectedFieldIds[0]),
-              }))
-              .concat();
-            addBlocks(selectedBlocks);
-          } else {
-            console.log("error, no selected cells");
-          }
-        }}
-        marginTop="16px"
-        width="100%"
-        height="28px"
-        backgroundColor="lightGray1"
         display="flex"
         flexDirection="row"
-        alignItems="center"
-        justifyContent="center"
+        justifyContent="space-between"
+        alignContent="center"
+        paddingX="2vw"
+        paddingY={3}
+        width="100%"
       >
-        <Icon
-          name="plus"
-          size={16}
-          fillColor="hsl(0,0%,46%)"
-          marginRight="4px"
-        />
-        <Text textColor="light">Add</Text>
+        <TextButton
+          onClick={() => addBlocks(getSelectedBlocks())}
+          icon="plus"
+          variant="light"
+        >
+          Add Block
+        </TextButton>
+        <Box>
+          <TextButton
+            onClick={() => console.log("Button download")}
+            icon="share1"
+            marginRight={3}
+            variant="light"
+          >
+            Export
+          </TextButton>
+          <TextButton
+            onClick={() => console.log("Button overflow")}
+            icon="overflow"
+            aria-label="overflow"
+            variant="light"
+          />
+        </Box>
+      </Box>
+    );
+  };
+  if (!isValid) {
+    return (
+      <div>
+        <Toolbar />
+      </div>
+    );
+  }
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      width="100vw"
+    >
+      <Toolbar />
+      <Box
+        paddingX="6vw"
+        paddingBottom={3}
+        display="flex"
+        flexDirection="column"
+        width="100%"
+      >
+        {!blockArrays.length ? (
+          <AddBlockButton
+            selectedBlocks={getSelectedBlocks()}
+            addBlocks={addBlocks}
+            isStaticButton={true}
+          />
+        ) : (
+          <AddBlockButton
+            selectedBlocks={getSelectedBlocks()}
+            addBlocks={addBlocks}
+            isStaticButton={false}
+          />
+        )}
+        <div>
+          {/* <Heading marginBottom={4}>{activeTable.name}</Heading> */}
+
+          {blockArrays.map((block, index) => (
+            <Box display="flex" flexDirection="column" width="100%">
+              <BlockPreview
+                table={block.table}
+                recordId={block.recordId}
+                field={block.field}
+              />
+              <AddBlockButton
+                selectedBlocks={getSelectedBlocks()}
+                addBlocks={addBlocks}
+                isStaticButton={blockArrays.length === index + 1 ? true : false}
+              />
+            </Box>
+          ))}
+        </div>
       </Box>
     </Box>
   );
