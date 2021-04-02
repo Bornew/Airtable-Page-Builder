@@ -53,6 +53,9 @@ export default function AddBlockButton({
         height="24px"
         backgroundColor="lightGray1"
         marginTop="16px"
+        onClick={() => {
+          addBlocks(selectedBlocks, insertIndex);
+        }}
       >
         <Box
           width="100%"
@@ -61,16 +64,8 @@ export default function AddBlockButton({
           flexDirection="row"
           alignItems="center"
           justifyContent="center"
-          onClick={() => {
-            addBlocks(selectedBlocks, insertIndex);
-          }}
         >
-          <TextButton
-            onClick={() => console.log("Button clicked")}
-            variant="light"
-            size="small"
-            icon="plus"
-          >
+          <TextButton variant="light" size="small" icon="plus">
             {message}
           </TextButton>
         </Box>
@@ -98,12 +93,7 @@ export default function AddBlockButton({
           alignItems="center"
           justifyContent="center"
         >
-          <TextButton
-            onClick={() => console.log("Button clicked")}
-            variant="light"
-            size="small"
-            icon="plus"
-          >
+          <TextButton variant="light" size="small" icon="plus">
             {message}
           </TextButton>
         </Box>

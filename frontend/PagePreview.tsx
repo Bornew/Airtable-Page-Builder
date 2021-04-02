@@ -34,13 +34,17 @@ export default function PagePreview({ isValid }: IProps) {
   const getSelectedBlocks = () => {
     let selectedBlocks: BlockInterface[] = [];
     if (selectedRecordIds && selectedFieldIds) {
-      selectedBlocks = selectedRecordIds
-        .map((selectedRecordId) => ({
-          table: activeTable,
-          recordId: selectedRecordId,
-          field: activeTable.getField(selectedFieldIds[0]),
-        }))
-        .concat();
+      for (let selectedRecordId of selectedRecordIds) {
+        console.log(selectedRecordId);
+        for (let selectedFieldId of selectedFieldIds) {
+          console.log(selectedFieldId);
+          selectedBlocks.push({
+            table: activeTable,
+            recordId: selectedRecordId,
+            field: activeTable.getField(selectedFieldId),
+          });
+        }
+      }
     }
     return selectedBlocks;
   };
@@ -66,6 +70,16 @@ export default function PagePreview({ isValid }: IProps) {
     newBlockArrays.splice(index, 1);
     newBlockArrays = [...newBlockArrays];
     setBlockArrays(newBlockArrays);
+  };
+
+  const countRepeatedNum = (item: any, arr: any[]) => {
+    let count = 0;
+    for (let i of arr) {
+      if (i === item) {
+        count++;
+      }
+    }
+    return count;
   };
 
   useEffect(() => {

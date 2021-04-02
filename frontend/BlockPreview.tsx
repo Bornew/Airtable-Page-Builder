@@ -7,13 +7,17 @@ import {
   Icon,
   TextButton,
   expandRecord,
+  loadCSSFromString,
 } from "@airtable/blocks/ui";
+import { githubStyle } from "./MarkdownPreviewStyle";
 import React, { useEffect, useState } from "react";
 import ReactDOMServer from "react-dom/server";
 // import sanitizeHtml from "sanitize-html";
 import MarkdownIt from "markdown-it";
 import { useSettings } from "./settings/settings";
+import SanitizeHTML from "./SanitizeHTML";
 
+loadCSSFromString(githubStyle);
 const md = new MarkdownIt({
   html: true,
   linkify: true,
@@ -54,7 +58,6 @@ export default function BlockPreview(props: {
     return <p>"Error: Record not found."</p>;
   }
   const html = (record.getCellValue(field) || "").toString();
-  console.log(html);
   const handleMouseEnter = () => {
     setHover(true);
   };
@@ -118,27 +121,16 @@ export default function BlockPreview(props: {
         ) : (
           ""
         )}
-
-        <ShowHTML html={html} />
+        <ShowHTML html={SanitizeHTML(md, { html })} />
       </Box>
     </Box>
   );
 }
 
 function ShowHTML({ html }: { html: string }) {
-  html = html
-    .replace(/^(\s*)\[(X|\s|\_|\-)\]\s(.*)/gim, "$1- [$2] $3")
-    .replace(/\n\[(.{1})]/g, "\\\n[$1]");
-
-  const html2 = md.render(html);
-
-  const domParser = new DOMParser();
-  const tmpEl = domParser.parseFromString(html2, "text/html");
-  const htmlFixed = tmpEl.body.innerHTML;
-  console.log("htmlFixed", htmlFixed);
   return (
     <Box>
-      <style>
+      {/* <style>
         {`
             .contains-task-list {
                 list-style: none;
@@ -178,8 +170,8 @@ function ShowHTML({ html }: { html: string }) {
                 outline: rgb(59, 153, 252) auto 5px;
             }
             `}
-      </style>
-      <div dangerouslySetInnerHTML={{ __html: htmlFixed }}></div>
+      </style> */}
+      <div dangerouslySetInnerHTML={{ __html: html }}></div>
     </Box>
   );
 }
