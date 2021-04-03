@@ -25,7 +25,7 @@ interface IProps {
   isValid: Boolean;
 }
 
-export function getSelectedBlocks(
+function getSelectedBlocks(
   activeTable: Table,
   selectedRecordIds: string[],
   selectedFieldIds: string[]
@@ -47,7 +47,10 @@ export function getSelectedBlocks(
   return selectedBlocks;
 }
 
-export async function getRecords(blocksArray: BlockInterface[]) {
+export async function exportBlocks(
+  isHTML: boolean,
+  blocksArray: BlockInterface[]
+) {
   let htmlPromise = "";
   for (let block of blocksArray) {
     const table = block.table;
@@ -55,11 +58,14 @@ export async function getRecords(blocksArray: BlockInterface[]) {
     const recordId = block.recordId;
     const queryResult = await table.selectRecordsAsync();
     const record = queryResult.getRecordById(recordId);
-    const html = (record.getCellValue(field) || "").toString();
+    let html = (record.getCellValue(field) || "").toString();
+    isHTML ? (html = SanitizeHTML({ html })) : html;
     htmlPromise += html;
   }
   return htmlPromise;
 }
+
+function downloadFile() {}
 
 export default function PagePreview({ isValid }: IProps) {
   let errorMessage = null;
@@ -127,7 +133,7 @@ export default function PagePreview({ isValid }: IProps) {
         <Box>
           <TextButton
             onClick={() => {
-              ExportHTML(getRecords(blocksArray));
+              ExportHTML(exportBlocks(true, blocksArray));
             }}
             icon="share1"
             marginRight={3}
