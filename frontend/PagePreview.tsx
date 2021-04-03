@@ -20,6 +20,7 @@ import BlockPreview from "./BlockPreview";
 import AddBlockButton from "./AddBlockButton";
 import ExportHTML from "./exportHTML";
 import SanitizeHTML from "./sanitizeHTML";
+import jsPDF from "jspdf";
 
 interface IProps {
   isValid: Boolean;
@@ -62,10 +63,35 @@ export async function exportBlocks(
     isHTML ? (html = SanitizeHTML({ html })) : html;
     htmlPromise += html;
   }
+  Promise.resolve(htmlPromise).then((value) => {
+    console.log(value);
+    isHTML
+      ? downloadFile(value, "notes.html")
+      : downloadFile(value, "notes.md");
+  });
   return htmlPromise;
 }
 
-function downloadFile() {}
+export const printFile = (html) => {
+  //   new jsPDF("p", "mm", "a4");
+  //   pdf.text(html, 1, 1);
+  //   pdf.save("pdf");
+  //   window.print();
+};
+
+export const downloadFile = (html, fileName) => {
+  var eleLink = document.createElement("a");
+  eleLink.download = fileName;
+  eleLink.style.display = "none";
+  // 字符内容转变成blob地址
+  var blob = new Blob([html]);
+  eleLink.href = URL.createObjectURL(blob);
+  // 触发点击
+  document.body.appendChild(eleLink);
+  eleLink.click();
+  // 然后移除
+  document.body.removeChild(eleLink);
+};
 
 export default function PagePreview({ isValid }: IProps) {
   let errorMessage = null;
