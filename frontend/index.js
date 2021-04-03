@@ -1,9 +1,5 @@
 import { initializeBlock } from "@airtable/blocks/ui";
 import React from "react";
+import PagePreviewBlock from "./PagePreview";
 
-function HelloWorldApp() {
-  // YOUR CODE GOES HERE
-  return <div>Hello world 🚀</div>;
-}
-
-initializeBlock(() => <HelloWorldApp />);
+initializeBlock(() => <PagePreviewBlock />);

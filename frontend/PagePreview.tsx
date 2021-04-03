@@ -1,7 +1,8 @@
-import { Table, Field } from "@airtable/blocks/models";
+import { Table, Field, Record } from "@airtable/blocks/models";
 import {
   useBase,
   useRecordById,
+  useRecords,
   useLoadable,
   useSettingsButton,
   useWatchable,
@@ -17,9 +18,47 @@ import { cursor } from "@airtable/blocks";
 import { allowedUrlFieldTypes, useSettings } from "./settings/settings";
 import BlockPreview from "./BlockPreview";
 import AddBlockButton from "./AddBlockButton";
+import ExportHTML from "./exportHTML";
+import SanitizeHTML from "./sanitizeHTML";
 
 interface IProps {
   isValid: Boolean;
+}
+
+export function getSelectedBlocks(
+  activeTable: Table,
+  selectedRecordIds: string[],
+  selectedFieldIds: string[]
+) {
+  let selectedBlocks: BlockInterface[] = [];
+
+  if (selectedRecordIds && selectedFieldIds) {
+    for (let selectedRecordId of selectedRecordIds) {
+      for (let selectedFieldId of selectedFieldIds) {
+        selectedBlocks.push({
+          table: activeTable,
+          recordId: selectedRecordId,
+          field: activeTable.getField(selectedFieldId),
+        });
+        console.log(selectedRecordId);
+      }
+    }
+  }
+  return selectedBlocks;
+}
+
+export async function getRecords(blocksArray: BlockInterface[]) {
+  let htmlPromise = "";
+  for (let block of blocksArray) {
+    const table = block.table;
+    const field = block.field;
+    const recordId = block.recordId;
+    const queryResult = await table.selectRecordsAsync();
+    const record = queryResult.getRecordById(recordId);
+    const html = (record.getCellValue(field) || "").toString();
+    htmlPromise += html;
+  }
+  return htmlPromise;
 }
 
 export default function PagePreview({ isValid }: IProps) {
@@ -27,64 +66,34 @@ export default function PagePreview({ isValid }: IProps) {
   const base = useBase();
   useWatchable(cursor, ["selectedRecordIds", "selectedFieldIds"]);
   const activeTable = base.getTableByIdIfExists(cursor.activeTableId);
-  const [blockArrays, setBlockArrays] = useState<BlockInterface[]>([]);
+  const [blocksArray, setBlocksArray] = useState<BlockInterface[]>([]);
   const selectedFieldIds = cursor.selectedFieldIds;
   const selectedRecordIds = cursor.selectedRecordIds;
-
-  const getSelectedBlocks = () => {
-    let selectedBlocks: BlockInterface[] = [];
-    if (selectedRecordIds && selectedFieldIds) {
-      for (let selectedRecordId of selectedRecordIds) {
-        console.log(selectedRecordId);
-        for (let selectedFieldId of selectedFieldIds) {
-          console.log(selectedFieldId);
-          selectedBlocks.push({
-            table: activeTable,
-            recordId: selectedRecordId,
-            field: activeTable.getField(selectedFieldId),
-          });
-        }
-      }
-    }
-    return selectedBlocks;
-  };
   const addBlocks = (selectedBlocks: BlockInterface[], index: number) => {
     if (selectedBlocks.length) {
-      let newBlockArrays = blockArrays;
-      if (blockArrays.length === index) {
-        newBlockArrays = blockArrays.concat(selectedBlocks);
+      let newBlocksArray = blocksArray;
+      if (blocksArray.length === index) {
+        newBlocksArray = blocksArray.concat(selectedBlocks);
       } else if (index === 0) {
-        newBlockArrays = selectedBlocks.concat(blockArrays);
+        newBlocksArray = selectedBlocks.concat(blocksArray);
       } else {
-        newBlockArrays.splice(index, 0, ...selectedBlocks);
-        newBlockArrays = [...newBlockArrays];
+        newBlocksArray.splice(index, 0, ...selectedBlocks);
+        newBlocksArray = [...newBlocksArray];
       }
-      setBlockArrays(newBlockArrays);
+      setBlocksArray(newBlocksArray);
     } else {
       console.log("you have not selected anything!");
     }
   };
 
   const deleteBlock = (index: number) => {
-    let newBlockArrays = blockArrays;
-    newBlockArrays.splice(index, 1);
-    newBlockArrays = [...newBlockArrays];
-    setBlockArrays(newBlockArrays);
+    let newBlocksArray = blocksArray;
+    newBlocksArray.splice(index, 1);
+    newBlocksArray = [...newBlocksArray];
+    setBlocksArray(newBlocksArray);
   };
 
-  const countRepeatedNum = (item: any, arr: any[]) => {
-    let count = 0;
-    for (let i of arr) {
-      if (i === item) {
-        count++;
-      }
-    }
-    return count;
-  };
-
-  useEffect(() => {
-    console.log("blockArrays", blockArrays);
-  }, [blockArrays]);
+  useEffect(() => {}, [blocksArray]);
 
   const Toolbar = () => {
     return (
@@ -100,7 +109,16 @@ export default function PagePreview({ isValid }: IProps) {
         height="20px"
       >
         <TextButton
-          onClick={() => addBlocks(getSelectedBlocks(), 1)}
+          onClick={() =>
+            addBlocks(
+              getSelectedBlocks(
+                activeTable,
+                selectedRecordIds,
+                selectedFieldIds
+              ),
+              1
+            )
+          }
           icon="plus"
           variant="light"
         >
@@ -108,7 +126,9 @@ export default function PagePreview({ isValid }: IProps) {
         </TextButton>
         <Box>
           <TextButton
-            onClick={() => console.log("Button download")}
+            onClick={() => {
+              ExportHTML(getRecords(blocksArray));
+            }}
             icon="share1"
             marginRight={3}
             variant="light"
@@ -143,25 +163,31 @@ export default function PagePreview({ isValid }: IProps) {
         flexDirection="column"
         width="100%"
       >
-        {!blockArrays.length ? (
+        {!blocksArray.length ? (
           <AddBlockButton
-            selectedBlocks={getSelectedBlocks()}
+            selectedBlocks={getSelectedBlocks(
+              activeTable,
+              selectedRecordIds,
+              selectedFieldIds
+            )}
             addBlocks={addBlocks}
             isStaticButton={true}
             insertIndex={0}
           />
         ) : (
           <AddBlockButton
-            selectedBlocks={getSelectedBlocks()}
+            selectedBlocks={getSelectedBlocks(
+              activeTable,
+              selectedRecordIds,
+              selectedFieldIds
+            )}
             addBlocks={addBlocks}
             isStaticButton={false}
             insertIndex={0}
           />
         )}
         <div>
-          {/* <Heading marginBottom={4}>{activeTable.name}</Heading> */}
-
-          {blockArrays.map((block, index) => (
+          {blocksArray.map((block, index) => (
             <Box display="flex" flexDirection="column" width="100%">
               <BlockPreview
                 table={block.table}
@@ -171,9 +197,13 @@ export default function PagePreview({ isValid }: IProps) {
                 deleteIndex={index}
               />
               <AddBlockButton
-                selectedBlocks={getSelectedBlocks()}
+                selectedBlocks={getSelectedBlocks(
+                  activeTable,
+                  selectedRecordIds,
+                  selectedFieldIds
+                )}
                 addBlocks={addBlocks}
-                isStaticButton={blockArrays.length === index + 1 ? true : false}
+                isStaticButton={blocksArray.length === index + 1 ? true : false}
                 insertIndex={index + 1}
               />
             </Box>
