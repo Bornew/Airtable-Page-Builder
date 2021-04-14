@@ -20,7 +20,9 @@ import BlockPreview from "./BlockPreview";
 import AddBlockButton from "./AddBlockButton";
 import ExportHTML from "./exportHTML";
 import SanitizeHTML from "./sanitizeHTML";
-import jsPDF from "jspdf";
+// import jsPDF from "jspdf";
+
+import HTML5Backend from "react-dnd-html5-backend";
 
 interface IProps {
   isValid: Boolean;

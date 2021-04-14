@@ -16,31 +16,10 @@ import ReactDOMServer from "react-dom/server";
 import MarkdownIt from "markdown-it";
 import { useSettings } from "./settings/settings";
 import SanitizeHTML from "./sanitizeHTML";
+import { useRef } from "react";
+import { useDrag, useDrop } from "react-dnd";
 
 loadCSSFromString(githubStyle);
-// const md = new MarkdownIt({
-//   html: true,
-//   linkify: true,
-// });
-
-// const defaultTextRender = md.renderer.rules.text;
-
-// md.renderer.rules.text = function (tokens, idx, options, env, self) {
-//   const token = tokens[idx];
-//   const matches = token.content.match(/\[(X|\s|\_|\-)\]\s(.*)/i);
-
-//   if (matches) {
-//     token.content = matches[2];
-//     return ReactDOMServer.renderToString(
-//       <span>
-//         <input type="checkbox" checked={matches[1].trim()} disabled />
-//         <label>{defaultTextRender(tokens, idx, options, env, self)}</label>
-//       </span>
-//     );
-//   }
-//   // pass token to default renderer.
-//   return defaultTextRender(tokens, idx, options, env, self);
-// };
 
 export default function BlockPreview(props: {
   table: Table;
