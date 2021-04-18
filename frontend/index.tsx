@@ -24,18 +24,18 @@ function PagePreviewBlock() {
   useWatchable(cursor, ["selectedRecordIds", "selectedFieldIds"]);
   const base = useBase();
   const activeTable = base.getTableByIdIfExists(cursor.activeTableId);
-  const { isValid } = useSettings();
-  if (!isValid && !isSettingsOpen) {
-    setIsSettingsOpen(true);
-  }
-  useEffect(() => {
-    // Display the settings form if the settings aren't valid.
+  // const { isValid } = useSettings();
+  // if (!isValid && !isSettingsOpen) {
+  //   setIsSettingsOpen(true);
+  // }
+  // useEffect(() => {
+  //   // Display the settings form if the settings aren't valid.
 
-    if (!isValid && !isSettingsOpen) {
-      setIsSettingsOpen(true);
-      viewport.enterFullscreenIfPossible();
-    }
-  }, [isValid, isSettingsOpen]);
+  //   if (!isValid && !isSettingsOpen) {
+  //     setIsSettingsOpen(true);
+  //     viewport.enterFullscreenIfPossible();
+  //   }
+  // }, [isValid, isSettingsOpen]);
   return (
     <Box
       position="absolute"
@@ -46,10 +46,10 @@ function PagePreviewBlock() {
       display="flex"
       flexDirection="column"
     >
-      <PagePreview isValid={isValid} />
-      {isSettingsOpen ? (
+      <PagePreview isValid={true} />
+      {/* {isSettingsOpen ? (
         <SettingsForm setIsSettingsOpen={setIsSettingsOpen} />
-      ) : null}
+      ) : null} */}
     </Box>
   );
 }

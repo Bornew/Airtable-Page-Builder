@@ -65,7 +65,12 @@ export default function AddBlockButton({
           alignItems="center"
           justifyContent="center"
         >
-          <TextButton variant="light" size="small" icon="plus">
+          <TextButton
+            variant="light"
+            size="small"
+            icon="plus"
+            disabled={selectedBlocks.length ? false : true}
+          >
             {message}
           </TextButton>
         </Box>
@@ -93,7 +98,12 @@ export default function AddBlockButton({
           alignItems="center"
           justifyContent="center"
         >
-          <TextButton variant="light" size="small" icon="plus">
+          <TextButton
+            variant="light"
+            size="small"
+            icon="plus"
+            disabled={selectedBlocks.length ? false : true}
+          >
             {message}
           </TextButton>
         </Box>

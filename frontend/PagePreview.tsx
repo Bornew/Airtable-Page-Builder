@@ -15,7 +15,7 @@ import {
 } from "@airtable/blocks/ui";
 import React, { useEffect, useState } from "react";
 import { cursor } from "@airtable/blocks";
-import { allowedUrlFieldTypes, useSettings } from "./settings/settings";
+// import { allowedUrlFieldTypes, useSettings } from "./settings/settings";
 import BlockPreview from "./BlockPreview";
 import AddBlockButton from "./AddBlockButton";
 import ExportHTML from "./exportHTML";
@@ -135,14 +135,14 @@ export default function PagePreview({ isValid }: IProps) {
         position="sticky"
         display="flex"
         flexDirection="row"
-        justifyContent="space-between"
+        justifyContent="flex-end"
         alignItems="center"
         paddingX="2vw"
         paddingY={3}
         width="100%"
         height="20px"
       >
-        <TextButton
+        {/* <TextButton
           onClick={() =>
             addBlocks(
               getSelectedBlocks(
@@ -157,7 +157,7 @@ export default function PagePreview({ isValid }: IProps) {
           variant="light"
         >
           Add Block
-        </TextButton>
+        </TextButton> */}
         <Box>
           <TextButton
             onClick={() => {
@@ -169,12 +169,12 @@ export default function PagePreview({ isValid }: IProps) {
           >
             Export
           </TextButton>
-          <TextButton
+          {/* <TextButton
             onClick={() => console.log("Button overflow")}
             icon="overflow"
             aria-label="overflow"
             variant="light"
-          />
+          /> */}
         </Box>
       </Box>
     );
@@ -198,16 +198,7 @@ export default function PagePreview({ isValid }: IProps) {
         width="100%"
       >
         {!blocksArray.length ? (
-          <AddBlockButton
-            selectedBlocks={getSelectedBlocks(
-              activeTable,
-              selectedRecordIds,
-              selectedFieldIds
-            )}
-            addBlocks={addBlocks}
-            isStaticButton={true}
-            insertIndex={0}
-          />
+          ""
         ) : (
           <AddBlockButton
             selectedBlocks={getSelectedBlocks(
@@ -230,7 +221,7 @@ export default function PagePreview({ isValid }: IProps) {
                 deleteBlock={deleteBlock}
                 deleteIndex={index}
               />
-              <AddBlockButton
+              {/* <AddBlockButton
                 selectedBlocks={getSelectedBlocks(
                   activeTable,
                   selectedRecordIds,
@@ -239,9 +230,19 @@ export default function PagePreview({ isValid }: IProps) {
                 addBlocks={addBlocks}
                 isStaticButton={blocksArray.length === index + 1 ? true : false}
                 insertIndex={index + 1}
-              />
+              /> */}
             </Box>
           ))}
+          <AddBlockButton
+            selectedBlocks={getSelectedBlocks(
+              activeTable,
+              selectedRecordIds,
+              selectedFieldIds
+            )}
+            addBlocks={addBlocks}
+            isStaticButton={true}
+            insertIndex={blocksArray.length}
+          />
         </div>
       </Box>
     </Box>
